@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "unity": "2022.3",
   "description": "Provider for connecting the Discord Social SDK to the social integration.",
+  "documentationUrl": "https://github.com/audunegames/discord-social-integration-provider",
+  "changelogUrl": "https://github.com/audunegames/discord-social-integration-provider/tree/master/CHANGELOG.md",
   "licensesUrl": "https://www.gnu.org/licenses/lgpl-3.0.html",
   "license": "LGPL-3.0-or-later",
   "author": {
