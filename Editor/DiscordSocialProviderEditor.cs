@@ -18,11 +18,9 @@ namespace Audune.Social.Discord.Editor
     private SerializedProperty _priority;
     private SerializedProperty _executionMode;
     private SerializedProperty _discordApplicationId;
-    private SerializedProperty _loggingSeverity;
 
     // Foldout state of the editor
     private bool _applicationDetailsFoldout = true;
-    private bool _providerSettingsDetailsFoldout = false;
     private bool _executionSettingsFoldout = false;
 
     // Return the target object of the editor
@@ -36,7 +34,6 @@ namespace Audune.Social.Discord.Editor
       _priority = serializedObject.FindProperty("_priority");
       _executionMode = serializedObject.FindProperty("_executionMode");
       _discordApplicationId = serializedObject.FindProperty("_discordApplicationId");
-      _loggingSeverity = serializedObject.FindProperty("_loggingSeverity");
     }
 
     // Draw the inspector GUI
@@ -54,15 +51,6 @@ namespace Audune.Social.Discord.Editor
         
         if (_discordApplicationId.ulongValue != 0 && GUILayout.Button("Open Application Settings"))
           Application.OpenURL(string.Format(_applicationSettingsURL, _discordApplicationId.ulongValue.ToString(CultureInfo.InvariantCulture)));
-
-        EditorGUILayout.Space();
-      }
-      EditorGUI.EndFoldoutHeaderGroup();
-
-      _providerSettingsDetailsFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(_providerSettingsDetailsFoldout, "Provider Settings");
-      if (_providerSettingsDetailsFoldout)
-      {
-        EditorGUILayout.PropertyField(_loggingSeverity);
 
         EditorGUILayout.Space();
       }

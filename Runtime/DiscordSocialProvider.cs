@@ -26,12 +26,11 @@ namespace Audune.Social.Discord
     // Variables
     [SerializeField, Tooltip("The Discord Application ID")]
     private ulong _discordApplicationId;
-    [SerializeField, Tooltip("The minimal severity of messages to log")]
-    private LoggingSeverity _loggingSeverity = LoggingSeverity.None;
     
     // Internal state
     private Client _client;
-    private DiscordUser _currentUser;
+    private LoggingSeverity _loggingSeverity = LoggingSeverity.None;
+    private bool _initialized = false;
     
     private readonly Dictionary<Type, object> _richPresenceAdapters = new Dictionary<Type, object>();
     
@@ -40,9 +39,17 @@ namespace Audune.Social.Discord
     /// Returns the Discord Application ID.
     /// </summary>
     public ulong discordApplicationId => _discordApplicationId;
+
+    /// <summary>
+    /// Returns and sets the logging severity of the Discord client.
+    /// </summary>
+    public LoggingSeverity loggingSeverity {
+      get => _loggingSeverity;
+      set =>  _loggingSeverity = value;
+    }
     
     /// <inheritdoc/>
-    public override bool isInitialized => _client != null;
+    public override bool isInitialized => _initialized;
     
     
     /// <inheritdoc/>
@@ -58,7 +65,7 @@ namespace Audune.Social.Discord
     }
     
     /// <inheritdoc/>
-    public override void OnEnableSocialProvider()
+    public override async void OnEnableSocialProvider()
     {
       base.OnEnableSocialProvider();
       
@@ -67,10 +74,23 @@ namespace Audune.Social.Discord
 
       // Add event handlers
       _client.AddLogCallback(OnLogMessage, _loggingSeverity);
-      _client.SetStatusChangedCallback((status, error, errorCode) => Debug.Log($"{Client.StatusToString(status)}, {Client.ErrorToString(error)}, {errorCode}"));
       
       // Set the application identifier
       _client.SetApplicationId(_discordApplicationId);
+      
+      // Check if the user is set
+      var currentUser = await GetCurrentUser();
+      if (currentUser == null)
+      {
+        Debug.LogError("[Discord] Could not initialize the Discord client", this);
+        return;
+      }
+      
+      // Set the initialized state
+      _initialized = true;
+
+      // Log the successful initialization
+      Debug.Log("[Discord] Successfully initialized the Discord client", this);
     }
     
     /// <inheritdoc/>
@@ -78,12 +98,15 @@ namespace Audune.Social.Discord
     {
       base.OnDisableSocialProvider();
       
-      // Check if the client is initialized
-      if (_client == null)
-        return;
-      
       // Dispose of the client
       _client.Dispose();
+      
+      // Check if the client is initialized
+      if (!_initialized)
+        return;
+
+      // Log the successful disposal
+      Debug.Log("[Discord] Successfully disposed of the Discord client", this);
     }
     
     
@@ -110,18 +133,18 @@ namespace Audune.Social.Discord
     
     #region User provider implementation
     /// <inheritdoc/>
-    public async UniTask<IUser> GetCurrentUser()
+    public UniTask<IUser> GetCurrentUser()
     {
-      var completed = false;
-      IUser currentUser = null;
+      var completionSource = new UniTaskCompletionSource<IUser>();
       
       _client.GetDiscordClientConnectedUser(_discordApplicationId, (result, userHandle) => {
-        currentUser = result.Successful() && userHandle != null ? new DiscordUser(this, userHandle) : null;
-        completed = true;
+        if (!result.Successful() || userHandle == null)
+          completionSource.TrySetResult(null);
+        else
+          completionSource.TrySetResult(new DiscordUser(this, userHandle));
       });
-      
-      await UniTask.WaitUntil(() => completed);
-      return currentUser;
+
+      return completionSource.Task;
     }
     #endregion
     
@@ -130,7 +153,7 @@ namespace Audune.Social.Discord
     public void UpdateRichPresence(IRichPresenceData data)
     {
       // Check if the client is initialized
-      if (_client == null)
+      if (!_initialized)
         return;
       
       // Get the adapter for the data
@@ -160,7 +183,7 @@ namespace Audune.Social.Discord
     public void ClearRichPresence()
     {
       // Check if the client is initialized
-      if (_client == null)
+      if (!_initialized)
         return;
       
       // Update the rich presence
@@ -191,7 +214,7 @@ namespace Audune.Social.Discord
     private void OnLogResult(ClientResult result)
     {
       if (!result.Successful())
-        Debug.LogError($"[Discord] {result.Error()}");
+        Debug.LogError($"[Discord] Error in API call: (Code {result.ErrorCode()}) {result.Error()}");
     }
     #endregion
   }
