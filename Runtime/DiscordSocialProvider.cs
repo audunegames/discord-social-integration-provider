@@ -9,6 +9,7 @@ namespace Audune.Social.Discord
   /// <summary>
   /// Class that defines a social provider for the Discord Social API.
   /// </summary>
+  [AddComponentMenu("Audune/Social/Discord Social Provider")]
   public sealed class DiscordSocialProvider : SocialProvider,
     IUserProvider,
     IIRichPresenceProvider
@@ -38,7 +39,7 @@ namespace Audune.Social.Discord
     /// <summary>
     /// Returns the Discord Application ID.
     /// </summary>
-    internal ulong discordApplicationId => _discordApplicationId;
+    public ulong discordApplicationId => _discordApplicationId;
     
     /// <inheritdoc/>
     public override bool isInitialized => _client != null;

@@ -1,0 +1,24 @@
+{
+    "name": "Audune.Social.Discord.Editor",
+    "rootNamespace": "Audune.Social.Discord.Editor",
+    "references": [
+        "GUID:52434a27d70886443a5275ecb276cd5c",
+        "GUID:4b110b78096576840988dc74b2126dd7",
+        "GUID:5864de56cd9105e4981c7c75a439d9e0",
+        "GUID:b86a2c45e07cba7419c757a0a689fd50",
+        "GUID:bdb03690b52b2c54686de4fe07bb3f5d",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:4129704b5a1a13841ba16f230bf24a57"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
