@@ -26,14 +26,7 @@ namespace Audune.Social.Discord
     public string displayName => _userHandle.DisplayName();
     
     /// <inheritdoc/>
-    public UserStatus status => _userHandle.Status() switch {
-      StatusType.Online => UserStatus.Online,
-      StatusType.Streaming => UserStatus.Online,
-      StatusType.Idle => UserStatus.Idle,
-      StatusType.Dnd => UserStatus.DoNotDisturb,
-      StatusType.Unknown => UserStatus.Unknown,
-      _ => UserStatus.Offline,
-    };
+    public UserStatus status => _userHandle.Status().ToUserStatus();
 
     /// <inheritdoc/>
     /// <remarks>
